@@ -3,6 +3,18 @@
 import sys
 import urllib.request
 
+if len(sys.argv) <= 1:
+    updateAll = True
+else:
+    if (sys.argv[1] == "-h"):
+        print("USAGE :")
+        print("\t./whitelist [pseudonyme]")
+        print("° pseudonyme is the pseudonyme you want to add to the whitelist with the correct uuid.")
+        print("° Don't pass any argument if you need to update the full uuid list.")
+        print("° The whitelis.json file should be in the same directory as the script file.")
+        exit(0)
+    updateAll = False
+    toAdd = sys.argv[1]
 
 def gest_error(code):
     print("ERROR !", code, file=sys.stderr)
@@ -44,14 +56,18 @@ try:
             if (len(sp) > 1):
                 name = sp[1].split("\"")[1]
                 names.append(name)
-                real_uuid = find_uuid(name)
+                real_uuid = find_uuid(name) if updateAll else uuid
                 if real_uuid == None:
                     print("could not read uuid for "+ name)
                     uuids.append(uuid)
                 else:
-                    print(real_uuid)
+                    if updateAll:
+                        print(real_uuid + " : " + name)
                     uuids.append(real_uuid)
         l += 1
+    if (not(updateAll)):
+        names.append(toAdd)
+        uuids.append(find_uuid(toAdd))
 except:
     gest_error("failed to load file")
 
